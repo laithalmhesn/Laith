@@ -85,3 +85,4 @@ export async function GET() {
 | Date | Changes |
 |------|---------|
 | Initial | Template created with base setup |
+| 2026-03-04 | Built GasNow Jordan - full bilingual gas delivery app UI |
