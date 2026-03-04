@@ -232,6 +232,29 @@ export default function Home() {
                   {t.loginAsAdmin}
                 </button>
               </div>
+
+              {/* Seller Login */}
+              <div className="bg-white rounded-2xl p-6 card-shadow">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                    <span className="text-xl">🛵</span>
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-800">
+                      {isRTL ? 'دخول البائع' : 'Seller Login'}
+                    </h3>
+                    <p className="text-gray-500 text-xs">
+                      {isRTL ? 'للبائعين المسجلين فقط' : 'Registered sellers only'}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setLoginType('seller')}
+                  className="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-green-700 transition-all"
+                >
+                  {isRTL ? 'دخول كبائع' : 'Login as Seller'}
+                </button>
+              </div>
             </div>
           ) : loginType === 'admin' ? (
             /* Admin Login Form — email only */
@@ -291,6 +314,60 @@ export default function Home() {
                   className="w-full bg-gray-800 text-white font-bold py-3 rounded-xl hover:bg-gray-900 transition-all"
                 >
                   {isRTL ? 'دخول كمشرف' : 'Login as Admin'}
+                </button>
+              </div>
+            </div>
+          ) : loginType === 'seller' ? (
+            /* Seller Login Form */
+            <div className="bg-white rounded-2xl p-6 card-shadow">
+              <button onClick={() => { setLoginType(null); setSellerPhone(''); setSellerPassword(''); }} className="text-green-600 text-sm mb-4 flex items-center gap-1 font-medium">
+                {isRTL ? '→ رجوع' : '← Back'}
+              </button>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                  <span className="text-xl">🛵</span>
+                </div>
+                <div>
+                  <h3 className="font-bold text-gray-800 text-lg">
+                    {isRTL ? 'دخول البائع' : 'Seller Login'}
+                  </h3>
+                  <p className="text-gray-500 text-xs">
+                    {isRTL ? 'ادخل بيانات حسابك' : 'Enter your account credentials'}
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                    {isRTL ? 'رقم الهاتف' : 'Phone Number'} *
+                  </label>
+                  <input
+                    type="tel"
+                    placeholder="07X XXX XXXX"
+                    value={sellerPhone}
+                    onChange={e => setSellerPhone(e.target.value)}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100 text-sm"
+                    dir="ltr"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                    {isRTL ? 'كلمة المرور' : 'Password'} *
+                  </label>
+                  <input
+                    type="password"
+                    placeholder="••••••••"
+                    value={sellerPassword}
+                    onChange={e => setSellerPassword(e.target.value)}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100 text-sm"
+                  />
+                </div>
+                <button
+                  onClick={handleSellerLogin}
+                  disabled={!sellerPhone.trim() || !sellerPassword.trim()}
+                  className="w-full bg-green-600 text-white font-bold py-3 rounded-xl hover:bg-green-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isRTL ? 'دخول كبائع' : 'Login as Seller'}
                 </button>
               </div>
             </div>
