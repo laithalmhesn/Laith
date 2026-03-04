@@ -129,7 +129,7 @@ export default function Home() {
 
         <div className="relative z-10 flex flex-col items-center text-center px-2">
           {/* Logo */}
-          <div className="animate-bounce-subtle mb-2">
+          <div className="animate-bounce-subtle">
             <AppLogo size="md" />
           </div>
 
@@ -140,7 +140,7 @@ export default function Home() {
           <p className="text-green-200 text-xs font-semibold mb-0.5">
             {isRTL ? 'الأردن' : 'Jordan'}
           </p>
-          <p className="text-green-100 text-xs mb-4 max-w-xs">
+          <p className="text-green-100 text-xs mb-2 max-w-xs">
             {t.appTagline}
           </p>
 
@@ -172,7 +172,7 @@ export default function Home() {
             {isRTL ? '🚀 ابدأ الآن' : '🚀 Get Started'}
           </button>
 
-          <p className="text-green-200/70 text-xs mt-3">
+          <p className="text-green-200/70 text-xs mt-1">
             {isRTL ? 'توصيل الغاز إلى بابك في الأردن' : 'Gas delivery to your door across Jordan'}
           </p>
         </div>
@@ -198,7 +198,7 @@ export default function Home() {
               <AppLogo size="md" />
             </div>
             <h1 className="text-2xl font-black text-white">{t.loginTitle}</h1>
-            <p className="text-green-100 mt-1 text-sm">{t.loginSubtitle}</p>
+            <p className="text-green-100 mt-0.5 text-xs">{t.loginSubtitle}</p>
           </div>
         </div>
 
