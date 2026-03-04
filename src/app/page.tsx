@@ -185,7 +185,7 @@ export default function Home() {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
         {/* Header */}
-        <div className="gradient-green px-3 pt-1 pb-1 text-center relative overflow-hidden">
+        <div className="gradient-green px-3 py-2 text-center relative overflow-hidden">
           <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-20 translate-x-20" />
           <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full translate-y-16 -translate-x-16" />
           <div className="absolute top-4 right-4 z-10">
@@ -406,7 +406,7 @@ export default function Home() {
     return (
       <div className="min-h-screen bg-gray-50 pb-20" dir={isRTL ? 'rtl' : 'ltr'}>
         {/* Hero Header */}
-        <div className="gradient-green px-6 pt-3 pb-8 relative overflow-hidden">
+        <div className="gradient-green px-6 pt-2 pb-6 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -translate-y-24 translate-x-24" />
           <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full translate-y-16 -translate-x-16" />
           <div className="relative flex items-center justify-between mb-4">
@@ -435,7 +435,7 @@ export default function Home() {
           </button>
         </div>
 
-        <div className="px-6 -mt-12">
+        <div className="px-6 -mt-10">
           {/* How it works */}
           <div className="bg-white rounded-2xl p-6 card-shadow mb-5">
             <h2 className="font-black text-gray-800 text-lg mb-5">{t.howItWorks}</h2>
