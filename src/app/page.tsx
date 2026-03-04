@@ -202,7 +202,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="flex-1 px-4 -mt-20 pb-6">
+        <div className="flex-1 px-4 -mt-12 pb-6">
           {!loginType ? (
             <div className="space-y-4">
               {/* Customer Login */}
