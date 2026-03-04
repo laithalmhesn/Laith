@@ -13,13 +13,13 @@ export function AppLogo({ size = 'md' }: AppLogoProps) {
     <div
       className={`${s.container} flex flex-col items-center justify-center flex-shrink-0`}
       style={{
-        background: 'linear-gradient(135deg, #16a34a 0%, #15803d 50%, #166534 100%)',
-        boxShadow: '0 8px 32px rgba(22, 163, 74, 0.45)',
+        background: 'white',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.25)',
       }}
     >
       <span className={s.flame}>🔥</span>
       {size !== 'sm' && (
-        <span className={`text-white font-black ${s.label} tracking-widest leading-none mt-0.5`}>GAS</span>
+        <span className={`font-black ${s.label} tracking-widest leading-none mt-0.5`} style={{ color: '#15803d' }}>GAS</span>
       )}
     </div>
   );
