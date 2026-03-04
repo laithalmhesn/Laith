@@ -127,7 +127,7 @@ export default function Home() {
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/5 rounded-full translate-y-48 -translate-x-48" />
         <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-white/5 rounded-full -translate-x-16 -translate-y-16" />
 
-        <div className="relative z-10 flex flex-col items-center text-center px-2">
+        <div className="relative z-10 flex flex-col items-center text-center px-1">
           {/* Logo */}
           <div className="animate-bounce-subtle">
             <AppLogo size="sm" />
@@ -145,7 +145,7 @@ export default function Home() {
           </p>
 
           {/* Language selector */}
-          <div className="bg-white/15 backdrop-blur-sm rounded-lg p-2 mb-3 w-full max-w-xs border border-white/20">
+          <div className="bg-white/15 backdrop-blur-sm rounded-lg p-1.5 mb-2 w-full max-w-xs border border-white/20">
             <p className="text-white/90 text-xs mb-2 font-semibold text-center">
               {isRTL ? 'اختر اللغة' : 'Choose Language'}
             </p>
@@ -185,7 +185,7 @@ export default function Home() {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
         {/* Header */}
-        <div className="gradient-green px-1 py-0.5 text-center relative overflow-hidden">
+        <div className="gradient-green px-1 py-0 text-center relative overflow-hidden">
           <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-20 translate-x-20" />
           <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full translate-y-16 -translate-x-16" />
           <div className="absolute top-4 right-4 z-10">
@@ -202,7 +202,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="flex-1 px-1 -mt-32 pb-0.5">
+        <div className="flex-1 px-1 -mt-36 pb-0">
           {!loginType ? (
             <div className="space-y-4">
               {/* Customer Login */}
