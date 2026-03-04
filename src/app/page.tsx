@@ -130,7 +130,7 @@ export default function Home() {
         <div className="relative z-10 flex flex-col items-center text-center px-2">
           {/* Logo */}
           <div className="animate-bounce-subtle">
-            <AppLogo size="md" />
+            <AppLogo size="sm" />
           </div>
 
           {/* App name */}
@@ -194,11 +194,11 @@ export default function Home() {
             </button>
           </div>
           <div className="relative z-10">
-            <div className="flex justify-center mb-3">
-              <AppLogo size="md" />
+            <div className="flex justify-center">
+              <AppLogo size="sm" />
             </div>
-            <h1 className="text-2xl font-black text-white">{t.loginTitle}</h1>
-            <p className="text-green-100 mt-0.5 text-xs">{t.loginSubtitle}</p>
+            <h1 className="text-xl font-black text-white">{t.loginTitle}</h1>
+            <p className="text-green-100 text-xs">{t.loginSubtitle}</p>
           </div>
         </div>
 
