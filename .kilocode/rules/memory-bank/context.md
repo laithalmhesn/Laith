@@ -12,6 +12,7 @@
 - [x] Made green header areas smaller (not covering text)
 - [x] Fixed app sizing (restored proper proportions after shrinking too much)
 - [x] Fixed login page margin (reduced -mt-20 to -mt-12 to show all login options)
+- [x] Removed fake sample data (sampleOrders, sampleSellers, sampleComplaints)
 
 ## Current Structure
 
@@ -47,6 +48,7 @@
 | 2026-03-04 | Made green header areas smaller (user request) |
 | 2026-03-04 | Fixed app sizing after shrinking too much - restored proper proportions |
 | 2026-03-04 | Fixed login page margin (reduced -mt-20 to -mt-12 to show all login options) |
+| 2026-03-04 | Removed fake sample data from admin panel and seller views |
 
 ## Design Notes
 
