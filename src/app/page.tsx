@@ -134,7 +134,7 @@ export default function Home() {
           </div>
 
           {/* App name */}
-          <h1 className="text-2xl font-black text-white mb-0.5 tracking-tight">
+          <h1 className="text-xl font-black text-white mb-0.5 tracking-tight">
             {isRTL ? 'غاز ناو' : 'GasNow'}
           </h1>
           <p className="text-green-200 text-xs font-semibold mb-0.5">
@@ -145,20 +145,20 @@ export default function Home() {
           </p>
 
           {/* Language selector */}
-          <div className="bg-white/15 backdrop-blur-sm rounded-xl p-3 mb-4 w-full max-w-xs border border-white/20">
-            <p className="text-white/90 text-sm mb-3 font-semibold text-center">
+          <div className="bg-white/15 backdrop-blur-sm rounded-lg p-2 mb-3 w-full max-w-xs border border-white/20">
+            <p className="text-white/90 text-xs mb-2 font-semibold text-center">
               {isRTL ? 'اختر اللغة' : 'Choose Language'}
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setLang('en')}
-                className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all ${lang === 'en' ? 'bg-white text-green-700 shadow-md' : 'bg-white/20 text-white hover:bg-white/30'}`}
+                className={`flex-1 py-2 rounded-lg font-bold text-xs transition-all ${lang === 'en' ? 'bg-white text-green-700 shadow-md' : 'bg-white/20 text-white hover:bg-white/30'}`}
               >
                 🇬🇧 English
               </button>
               <button
                 onClick={() => setLang('ar')}
-                className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all ${lang === 'ar' ? 'bg-white text-green-700 shadow-md' : 'bg-white/20 text-white hover:bg-white/30'}`}
+                className={`flex-1 py-2 rounded-lg font-bold text-xs transition-all ${lang === 'ar' ? 'bg-white text-green-700 shadow-md' : 'bg-white/20 text-white hover:bg-white/30'}`}
               >
                 🇯🇴 العربية
               </button>
@@ -167,7 +167,7 @@ export default function Home() {
 
           <button
             onClick={() => setView('login')}
-            className="bg-white text-green-700 font-bold py-3 px-10 rounded-xl text-base card-shadow-lg hover:bg-green-50 transition-all active:scale-95"
+            className="bg-white text-green-700 font-bold py-2 px-6 rounded-lg text-sm card-shadow-lg hover:bg-green-50 transition-all active:scale-95"
           >
             {isRTL ? '🚀 ابدأ الآن' : '🚀 Get Started'}
           </button>
