@@ -10,7 +10,7 @@ interface TopBarProps {
 
 export function TopBar({ title, isRTL, switchLangLabel, onToggleLang, onExit }: TopBarProps) {
   return (
-    <div className="gradient-green px-5 pt-10 pb-5 relative overflow-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="gradient-green px-5 pt-6 pb-3 relative overflow-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Decorative circle */}
       <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-16 translate-x-16 pointer-events-none" />
 
