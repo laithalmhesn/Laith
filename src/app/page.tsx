@@ -185,7 +185,7 @@ export default function Home() {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
         {/* Header */}
-        <div className="gradient-green px-3 py-2 text-center relative overflow-hidden">
+        <div className="gradient-green px-2 py-1 text-center relative overflow-hidden">
           <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-20 translate-x-20" />
           <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full translate-y-16 -translate-x-16" />
           <div className="absolute top-4 right-4 z-10">
@@ -197,12 +197,12 @@ export default function Home() {
             <div className="flex justify-center">
               <AppLogo size="sm" />
             </div>
-            <h1 className="text-xl font-black text-white">{t.loginTitle}</h1>
+            <h1 className="text-lg font-black text-white">{t.loginTitle}</h1>
             <p className="text-green-100 text-xs">{t.loginSubtitle}</p>
           </div>
         </div>
 
-        <div className="flex-1 px-3 -mt-24 pb-1">
+        <div className="flex-1 px-2 -mt-28 pb-1">
           {!loginType ? (
             <div className="space-y-4">
               {/* Customer Login */}
