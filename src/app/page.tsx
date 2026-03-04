@@ -210,29 +210,6 @@ export default function Home() {
                 </button>
               </div>
 
-              {/* Seller Login */}
-              <div className="bg-white rounded-2xl p-6 card-shadow">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                    <span className="text-xl">🛵</span>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-gray-800">
-                      {isRTL ? 'دخول البائع' : 'Seller Login'}
-                    </h3>
-                    <p className="text-gray-500 text-xs">
-                      {isRTL ? 'ادخل برقم هاتفك وكلمة المرور' : 'Sign in with phone & password'}
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setLoginType('seller')}
-                  className="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-green-700 transition-all"
-                >
-                  {t.loginAsSeller}
-                </button>
-              </div>
-
               {/* Admin Login */}
               <div className="bg-white rounded-2xl p-6 card-shadow">
                 <div className="flex items-center gap-3 mb-4">
