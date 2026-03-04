@@ -185,7 +185,7 @@ export default function Home() {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
         {/* Header */}
-        <div className="gradient-green px-6 pt-8 pb-10 text-center relative overflow-hidden">
+        <div className="gradient-green px-6 pt-6 pb-8 text-center relative overflow-hidden">
           <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-20 translate-x-20" />
           <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full translate-y-16 -translate-x-16" />
           <div className="absolute top-4 right-4 z-10">
@@ -202,7 +202,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="flex-1 px-6 -mt-6 pb-8">
+        <div className="flex-1 px-6 -mt-4 pb-8">
           {!loginType ? (
             <div className="space-y-4">
               {/* Customer Login */}
