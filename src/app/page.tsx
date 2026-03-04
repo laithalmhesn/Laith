@@ -8,44 +8,120 @@ import { AppLogo } from "@/components/AppLogo";
 
 type View = 'splash' | 'login' | 'customer-home' | 'order' | 'safety' | 'complaints' | 'account' | 'seller' | 'seller-orders' | 'admin';
 type UserRole = 'customer' | 'seller' | 'admin' | null;
+type OrderStatus = 'pending' | 'accepted' | 'delivered' | 'rejected';
+type ComplaintStatus = 'pending' | 'resolved';
+
+interface Order {
+  id: number;
+  customerName: string;
+  customerPhone: string;
+  cylinders: number;
+  address: string;
+  status: OrderStatus;
+  date: string;
+  sellerId?: number;
+}
+
+interface Seller {
+  id: number;
+  name: string;
+  phone: string;
+  password: string;
+}
+
+interface Complaint {
+  id: number;
+  message: string;
+  status: ComplaintStatus;
+  date: string;
+}
 
 const ADMIN_EMAIL = 'zerogoast@gmail.com';
+const ADMIN_PASSWORD = 'laaith20099';
 
 export default function Home() {
   const [lang, setLang] = useState<Language>('en');
   const [view, setView] = useState<View>('splash');
   const [role, setRole] = useState<UserRole>(null);
   const [loginType, setLoginType] = useState<'admin' | 'seller' | null>(null);
-  const [orderSent, setOrderSent] = useState(false);
-  const [complaintSent, setComplaintSent] = useState(false);
-  const [locationShared, setLocationShared] = useState(false);
-  const [orderForm, setOrderForm] = useState({ phone: '', cylinders: '', address: '' });
+  
+  // Data stores
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [sellers, setSellers] = useState<Seller[]>([]);
+  const [complaints, setComplaints] = useState<Complaint[]>([]);
+  
+  // Form states
+  const [orderForm, setOrderForm] = useState({ phone: '', cylinders: '1', address: '' });
   const [complaintText, setComplaintText] = useState('');
+  const [locationShared, setLocationShared] = useState(false);
+  
+  // Admin tab
   const [adminTab, setAdminTab] = useState<'dashboard' | 'sellers' | 'complaints' | 'orders'>('dashboard');
-  const [acceptedOrders, setAcceptedOrders] = useState<number[]>([]);
-  const [deliveredOrders, setDeliveredOrders] = useState<number[]>([]);
   const [showAddSeller, setShowAddSeller] = useState(false);
-
+  const [newSeller, setNewSeller] = useState({ name: '', phone: '', password: '' });
+  
+  // Current logged in seller
+  const [currentSellerId, setCurrentSellerId] = useState<number | null>(null);
+  
   // Admin login form state
   const [adminEmail, setAdminEmail] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
   const [adminLoginError, setAdminLoginError] = useState('');
-
+  
   // Seller login form state
   const [sellerPhone, setSellerPhone] = useState('');
   const [sellerPassword, setSellerPassword] = useState('');
+  const [sellerLoginError, setSellerLoginError] = useState('');
 
   const t = translations[lang];
   const isRTL = lang === 'ar';
 
   const toggleLang = () => setLang(l => l === 'en' ? 'ar' : 'en');
-  const handleExit = () => { setRole(null); setView('login'); };
+  
+  const handleExit = () => { 
+    setRole(null); 
+    setView('login'); 
+    setLoginType(null);
+    setCurrentSellerId(null);
+    setAdminEmail('');
+    setAdminPassword('');
+    setSellerPhone('');
+    setSellerPassword('');
+    setAdminLoginError('');
+    setSellerLoginError('');
+  };
 
-  const handleAcceptOrder = (id: number) => setAcceptedOrders(prev => [...prev, id]);
-  const handleMarkDelivered = (id: number) => setDeliveredOrders(prev => [...prev, id]);
+  // Generate order ID
+  const generateOrderId = () => {
+    return `ORD-${Date.now()}`;
+  };
+
+  // Get available orders (pending) for sellers
+  const availableOrders = orders.filter(o => o.status === 'pending');
+  
+  // Get orders accepted by current seller
+  const sellerAcceptedOrders = orders.filter(o => o.sellerId === currentSellerId && (o.status === 'accepted' || o.status === 'delivered'));
+
+  const handleAcceptOrder = (orderId: number) => {
+    setOrders(prev => prev.map(o => 
+      o.id === orderId ? { ...o, status: 'accepted' as OrderStatus, sellerId: currentSellerId || undefined } : o
+    ));
+  };
+
+  const handleRejectOrder = (orderId: number) => {
+    setOrders(prev => prev.map(o => 
+      o.id === orderId ? { ...o, status: 'rejected' as OrderStatus } : o
+    ));
+  };
+
+  const handleMarkDelivered = (orderId: number) => {
+    setOrders(prev => prev.map(o => 
+      o.id === orderId ? { ...o, status: 'delivered' as OrderStatus } : o
+    ));
+  };
 
   const getStatusStyle = (status: string) => {
-    switch (status.toLowerCase()) {
+    switch (status) {
       case 'pending': return 'bg-amber-100 text-amber-800';
       case 'accepted': return 'bg-green-100 text-green-800';
       case 'delivered': return 'bg-blue-100 text-blue-800';
@@ -57,16 +133,16 @@ export default function Home() {
 
   const getStatusLabel = (status: string) => {
     const map: Record<string, string> = {
-      'Pending': isRTL ? 'قيد الانتظار' : 'Pending',
-      'Accepted': isRTL ? 'مقبول' : 'Accepted',
-      'Delivered': isRTL ? 'تم التوصيل' : 'Delivered',
-      'Rejected': isRTL ? 'مرفوض' : 'Rejected',
       'pending': isRTL ? 'قيد الانتظار' : 'Pending',
+      'accepted': isRTL ? 'مقبول' : 'Accepted',
+      'delivered': isRTL ? 'تم التوصيل' : 'Delivered',
+      'rejected': isRTL ? 'مرفوض' : 'Rejected',
       'resolved': isRTL ? 'محلول' : 'Resolved',
     };
     return map[status] || status;
   };
 
+  // Admin Login - with email AND password validation
   const handleAdminLogin = () => {
     setAdminLoginError('');
     if (!adminEmail.trim() || !adminPassword.trim()) {
@@ -74,9 +150,14 @@ export default function Home() {
       return;
     }
     if (adminEmail.trim().toLowerCase() !== ADMIN_EMAIL) {
-      setAdminLoginError(isRTL ? 'البريد الإلكتروني غير صحيح. ليس لديك صلاحية الدخول.' : 'Invalid email. You are not authorized to access the admin panel.');
+      setAdminLoginError(isRTL ? 'البريد الإلكتروني غير صحيح' : 'Invalid email');
       return;
     }
+    if (adminPassword.trim() !== ADMIN_PASSWORD) {
+      setAdminLoginError(isRTL ? 'كلمة المرور غير صحيحة' : 'Invalid password');
+      return;
+    }
+    // Success
     setRole('admin');
     setView('admin');
     setLoginType(null);
@@ -84,32 +165,92 @@ export default function Home() {
     setAdminPassword('');
   };
 
+  // Seller Login - validate against stored sellers
   const handleSellerLogin = () => {
-    if (sellerPhone.trim() && sellerPassword.trim()) {
-      setRole('seller');
-      setView('seller');
-      setLoginType(null);
-      setSellerPhone('');
-      setSellerPassword('');
+    setSellerLoginError('');
+    if (!sellerPhone.trim() || !sellerPassword.trim()) {
+      setSellerLoginError(isRTL ? 'يرجى إدخال رقم الهاتف وكلمة المرور' : 'Please enter phone and password');
+      return;
     }
+    
+    const seller = sellers.find(s => s.phone === sellerPhone.trim() && s.password === sellerPassword.trim());
+    if (!seller) {
+      setSellerLoginError(isRTL ? 'رقم الهاتف أو كلمة المرور غير صحيحة' : 'Invalid phone or password');
+      return;
+    }
+    
+    setRole('seller');
+    setCurrentSellerId(seller.id);
+    setView('seller');
+    setLoginType(null);
+    setSellerPhone('');
+    setSellerPassword('');
+    setSellerLoginError('');
+  };
+
+  // Add new seller
+  const handleAddSeller = () => {
+    if (!newSeller.name.trim() || !newSeller.phone.trim() || !newSeller.password.trim()) {
+      return;
+    }
+    const newId = sellers.length > 0 ? Math.max(...sellers.map(s => s.id)) + 1 : 1;
+    setSellers(prev => [...prev, { ...newSeller, id: newId }]);
+    setNewSeller({ name: '', phone: '', password: '' });
+    setShowAddSeller(false);
+  };
+
+  // Submit order
+  const handleSubmitOrder = () => {
+    if (orderForm.phone && orderForm.cylinders && orderForm.address) {
+      const newOrder: Order = {
+        id: Date.now(),
+        customerName: 'Customer',
+        customerPhone: orderForm.phone,
+        cylinders: parseInt(orderForm.cylinders),
+        address: orderForm.address,
+        status: 'pending',
+        date: new Date().toLocaleDateString(),
+      };
+      setOrders(prev => [...prev, newOrder]);
+      setOrderForm({ phone: '', cylinders: '1', address: '' });
+      setLocationShared(false);
+    }
+  };
+
+  // Submit complaint
+  const handleSubmitComplaint = () => {
+    if (complaintText.trim()) {
+      const newComplaint: Complaint = {
+        id: Date.now(),
+        message: complaintText.trim(),
+        status: 'pending',
+        date: new Date().toLocaleDateString(),
+      };
+      setComplaints(prev => [...prev, newComplaint]);
+      setComplaintText('');
+    }
+  };
+
+  // Resolve complaint
+  const handleResolveComplaint = (complaintId: number) => {
+    setComplaints(prev => prev.map(c => 
+      c.id === complaintId ? { ...c, status: 'resolved' as ComplaintStatus } : c
+    ));
   };
 
   // ─── SPLASH SCREEN ───────────────────────────────────────────────────────────
   if (view === 'splash') {
     return (
       <div className="min-h-screen gradient-green flex flex-col items-center justify-center relative overflow-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
-        {/* Decorative circles */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-32 translate-x-32" />
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/5 rounded-full translate-y-48 -translate-x-48" />
         <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-white/5 rounded-full -translate-x-16 -translate-y-16" />
 
         <div className="relative z-10 flex flex-col items-center text-center px-1">
-          {/* Logo */}
           <div className="animate-bounce-subtle">
             <AppLogo size="md" />
           </div>
 
-          {/* App name */}
           <h1 className="text-2xl font-black text-white mb-1 tracking-tight">
             {isRTL ? 'غاز ناو' : 'GasNow'}
           </h1>
@@ -120,7 +261,6 @@ export default function Home() {
             {t.appTagline}
           </p>
 
-          {/* Language selector */}
           <div className="bg-white/15 backdrop-blur-sm rounded-lg p-3 mb-3 w-full max-w-xs border border-white/20">
             <p className="text-white/90 text-sm mb-2 font-semibold text-center">
               {isRTL ? 'اختر اللغة' : 'Choose Language'}
@@ -160,7 +300,6 @@ export default function Home() {
   if (view === 'login') {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
-        {/* Header */}
         <div className="gradient-green px-2 py-2 text-center relative overflow-hidden">
           <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-20 translate-x-20" />
           <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full translate-y-16 -translate-x-16" />
@@ -257,7 +396,7 @@ export default function Home() {
               </div>
             </div>
           ) : loginType === 'admin' ? (
-            /* Admin Login Form — email only */
+            /* Admin Login Form */
             <div className="bg-white rounded-2xl p-6 card-shadow">
               <button onClick={() => { setLoginType(null); setAdminLoginError(''); setAdminEmail(''); setAdminPassword(''); }} className="text-green-600 text-sm mb-4 flex items-center gap-1 font-medium">
                 {isRTL ? '→ رجوع' : '← Back'}
@@ -290,7 +429,7 @@ export default function Home() {
                   </label>
                   <input
                     type="email"
-                    placeholder={isRTL ? 'أدخل بريدك الإلكتروني' : 'Enter your email address'}
+                    placeholder="zerogoast@gmail.com"
                     value={adminEmail}
                     onChange={e => { setAdminEmail(e.target.value); setAdminLoginError(''); }}
                     className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100 text-sm"
@@ -317,64 +456,10 @@ export default function Home() {
                 </button>
               </div>
             </div>
-          ) : loginType === 'seller' ? (
-            /* Seller Login Form */
-            <div className="bg-white rounded-2xl p-6 card-shadow">
-              <button onClick={() => { setLoginType(null); setSellerPhone(''); setSellerPassword(''); }} className="text-green-600 text-sm mb-4 flex items-center gap-1 font-medium">
-                {isRTL ? '→ رجوع' : '← Back'}
-              </button>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                  <span className="text-xl">🛵</span>
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-800 text-lg">
-                    {isRTL ? 'دخول البائع' : 'Seller Login'}
-                  </h3>
-                  <p className="text-gray-500 text-xs">
-                    {isRTL ? 'ادخل بيانات حسابك' : 'Enter your account credentials'}
-                  </p>
-                </div>
-              </div>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                    {isRTL ? 'رقم الهاتف' : 'Phone Number'} *
-                  </label>
-                  <input
-                    type="tel"
-                    placeholder="07X XXX XXXX"
-                    value={sellerPhone}
-                    onChange={e => setSellerPhone(e.target.value)}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100 text-sm"
-                    dir="ltr"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                    {isRTL ? 'كلمة المرور' : 'Password'} *
-                  </label>
-                  <input
-                    type="password"
-                    placeholder="••••••••"
-                    value={sellerPassword}
-                    onChange={e => setSellerPassword(e.target.value)}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100 text-sm"
-                  />
-                </div>
-                <button
-                  onClick={handleSellerLogin}
-                  disabled={!sellerPhone.trim() || !sellerPassword.trim()}
-                  className="w-full bg-green-600 text-white font-bold py-3 rounded-xl hover:bg-green-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isRTL ? 'دخول كبائع' : 'Login as Seller'}
-                </button>
-              </div>
-            </div>
           ) : (
             /* Seller Login Form */
             <div className="bg-white rounded-2xl p-6 card-shadow">
-              <button onClick={() => { setLoginType(null); setSellerPhone(''); setSellerPassword(''); }} className="text-green-600 text-sm mb-4 flex items-center gap-1 font-medium">
+              <button onClick={() => { setLoginType(null); setSellerLoginError(''); setSellerPhone(''); setSellerPassword(''); }} className="text-green-600 text-sm mb-4 flex items-center gap-1 font-medium">
                 {isRTL ? '→ رجوع' : '← Back'}
               </button>
               <div className="flex items-center gap-3 mb-6">
@@ -390,6 +475,14 @@ export default function Home() {
                   </p>
                 </div>
               </div>
+
+              {sellerLoginError && (
+                <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4 flex items-start gap-2">
+                  <span className="text-red-500 text-sm flex-shrink-0">⚠️</span>
+                  <p className="text-red-700 text-sm">{sellerLoginError}</p>
+                </div>
+              )}
+
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">
@@ -399,7 +492,7 @@ export default function Home() {
                     type="tel"
                     placeholder="07X XXX XXXX"
                     value={sellerPhone}
-                    onChange={e => setSellerPhone(e.target.value)}
+                    onChange={e => { setSellerPhone(e.target.value); setSellerLoginError(''); }}
                     className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100 text-sm"
                     dir="ltr"
                   />
@@ -412,7 +505,7 @@ export default function Home() {
                     type="password"
                     placeholder="••••••••"
                     value={sellerPassword}
-                    onChange={e => setSellerPassword(e.target.value)}
+                    onChange={e => { setSellerPassword(e.target.value); setSellerLoginError(''); }}
                     className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100 text-sm"
                   />
                 </div>
@@ -433,9 +526,11 @@ export default function Home() {
 
   // ─── CUSTOMER HOME ────────────────────────────────────────────────────────────
   if (view === 'customer-home') {
+    // Get customer's own orders
+    const myOrders = orders;
+
     return (
       <div className="min-h-screen bg-gray-50 pb-20" dir={isRTL ? 'rtl' : 'ltr'}>
-        {/* Hero Header */}
         <div className="gradient-green px-3 pt-4 pb-6 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -translate-y-24 translate-x-24" />
           <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full translate-y-16 -translate-x-16" />
@@ -466,7 +561,6 @@ export default function Home() {
         </div>
 
         <div className="px-4 pt-4">
-          {/* How it works */}
           <div className="bg-white rounded-2xl p-6 card-shadow mb-5">
             <h2 className="font-black text-gray-800 text-lg mb-5">{t.howItWorks}</h2>
             <div className="space-y-4">
@@ -488,7 +582,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Features */}
           <h2 className="font-black text-gray-800 text-lg mb-4">{t.whyChooseUs}</h2>
           <div className="grid grid-cols-2 gap-3 mb-5">
             {[
@@ -526,123 +619,89 @@ export default function Home() {
         <TopBar title={t.orderTitle} isRTL={isRTL} switchLangLabel={t.switchLanguage} onToggleLang={toggleLang} onExit={handleExit} />
 
         <div className="px-6 py-6">
-          {orderSent ? (
-            <div className="bg-white rounded-2xl p-8 card-shadow text-center">
-              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-4xl">✅</span>
+          <div className="bg-white rounded-2xl p-6 card-shadow">
+            <p className="text-gray-500 text-sm mb-6 leading-relaxed">{t.orderSubtitle}</p>
+            <div className="space-y-5">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1.5">{t.phoneNumber} *</label>
+                <input
+                  type="tel"
+                  placeholder={t.phonePlaceholder}
+                  value={orderForm.phone}
+                  onChange={e => setOrderForm(p => ({ ...p, phone: e.target.value }))}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100 text-sm"
+                  dir="ltr"
+                />
               </div>
-              <h2 className="text-xl font-black text-gray-800 mb-2">{t.orderSuccess}</h2>
-              <p className="text-gray-500 text-sm mb-6 leading-relaxed">{t.orderSuccessDesc}</p>
-              <div className="bg-green-50 border border-green-100 rounded-xl p-4 mb-6 text-left" dir="ltr">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-gray-500">{isRTL ? 'رقم الطلب' : 'Order ID'}</span>
-                  <span className="font-black text-green-700 text-sm">#ORD-2024-005</span>
-                </div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-gray-500">{t.cylinderCount}</span>
-                  <span className="font-bold text-gray-800 text-sm">{orderForm.cylinders} {t.cylinders}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">{isRTL ? 'الحالة' : 'Status'}</span>
-                  <span className="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full">{t.orderPending}</span>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1.5">{t.cylinderCount} *</label>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setOrderForm(p => ({ ...p, cylinders: String(Math.max(1, parseInt(p.cylinders || '1') - 1)) }))}
+                    className="w-12 h-12 bg-gray-100 rounded-xl text-xl font-black text-gray-600 hover:bg-gray-200 transition flex items-center justify-center"
+                  >
+                    −
+                  </button>
+                  <input
+                    type="number"
+                    min="1"
+                    placeholder="1"
+                    value={orderForm.cylinders}
+                    onChange={e => setOrderForm(p => ({ ...p, cylinders: e.target.value }))}
+                    className="flex-1 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100 text-center text-xl font-black"
+                  />
+                  <button
+                    onClick={() => setOrderForm(p => ({ ...p, cylinders: String(parseInt(p.cylinders || '0') + 1) }))}
+                    className="w-12 h-12 bg-green-100 rounded-xl text-xl font-black text-green-600 hover:bg-green-200 transition flex items-center justify-center"
+                  >
+                    +
+                  </button>
                 </div>
               </div>
-              <button
-                onClick={() => { setOrderSent(false); setOrderForm({ phone: '', cylinders: '', address: '' }); setLocationShared(false); }}
-                className="w-full bg-green-600 text-white font-bold py-3 rounded-xl hover:bg-green-700 transition"
+
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1.5">{t.address} *</label>
+                <textarea
+                  placeholder={t.addressPlaceholder}
+                  value={orderForm.address}
+                  onChange={e => setOrderForm(p => ({ ...p, address: e.target.value }))}
+                  rows={3}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100 text-sm resize-none leading-relaxed"
+                />
+              </div>
+
+              <div
+                onClick={() => setLocationShared(!locationShared)}
+                className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${locationShared ? 'border-green-500 bg-green-50' : 'border-gray-200 bg-gray-50 hover:border-gray-300'}`}
               >
-                {isRTL ? '+ طلب جديد' : '+ New Order'}
+                <div className={`w-12 h-6 rounded-full transition-all relative flex-shrink-0 ${locationShared ? 'bg-green-500' : 'bg-gray-300'}`}>
+                  <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all ${locationShared ? (isRTL ? 'right-1' : 'left-7') : (isRTL ? 'right-7' : 'left-1')}`} />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-gray-700">📍 {t.shareLocation}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">{t.shareLocationDesc}</p>
+                </div>
+              </div>
+
+              {locationShared && (
+                <div className="bg-green-50 border border-green-200 rounded-xl p-3 flex items-center gap-2">
+                  <span className="text-green-600 flex-shrink-0">📍</span>
+                  <span className="text-green-700 text-sm font-medium">
+                    {isRTL ? 'تم مشاركة الموقع' : 'Location shared'}
+                  </span>
+                </div>
+              )}
+
+              <button
+                onClick={handleSubmitOrder}
+                disabled={!orderForm.phone || !orderForm.cylinders || !orderForm.address}
+                className="w-full gradient-green text-white font-black py-4 rounded-2xl card-shadow hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-base"
+              >
+                🔥 {t.sendOrder}
               </button>
             </div>
-          ) : (
-            <div className="bg-white rounded-2xl p-6 card-shadow">
-              <p className="text-gray-500 text-sm mb-6 leading-relaxed">{t.orderSubtitle}</p>
-              <div className="space-y-5">
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-1.5">{t.phoneNumber} *</label>
-                  <input
-                    type="tel"
-                    placeholder={t.phonePlaceholder}
-                    value={orderForm.phone}
-                    onChange={e => setOrderForm(p => ({ ...p, phone: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100 text-sm"
-                    dir="ltr"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-1.5">{t.cylinderCount} *</label>
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={() => setOrderForm(p => ({ ...p, cylinders: String(Math.max(1, parseInt(p.cylinders || '1') - 1)) }))}
-                      className="w-12 h-12 bg-gray-100 rounded-xl text-xl font-black text-gray-600 hover:bg-gray-200 transition flex items-center justify-center"
-                    >
-                      −
-                    </button>
-                    <input
-                      type="number"
-                      min="1"
-                      placeholder="1"
-                      value={orderForm.cylinders}
-                      onChange={e => setOrderForm(p => ({ ...p, cylinders: e.target.value }))}
-                      className="flex-1 border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100 text-center text-xl font-black"
-                    />
-                    <button
-                      onClick={() => setOrderForm(p => ({ ...p, cylinders: String(parseInt(p.cylinders || '0') + 1) }))}
-                      className="w-12 h-12 bg-green-100 rounded-xl text-xl font-black text-green-600 hover:bg-green-200 transition flex items-center justify-center"
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-1.5">{t.address} *</label>
-                  <textarea
-                    placeholder={t.addressPlaceholder}
-                    value={orderForm.address}
-                    onChange={e => setOrderForm(p => ({ ...p, address: e.target.value }))}
-                    rows={3}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100 text-sm resize-none leading-relaxed"
-                  />
-                </div>
-
-                <div
-                  onClick={() => setLocationShared(!locationShared)}
-                  className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${locationShared ? 'border-green-500 bg-green-50' : 'border-gray-200 bg-gray-50 hover:border-gray-300'}`}
-                >
-                  <div className={`w-12 h-6 rounded-full transition-all relative flex-shrink-0 ${locationShared ? 'bg-green-500' : 'bg-gray-300'}`}>
-                    <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all ${locationShared ? (isRTL ? 'right-1' : 'left-7') : (isRTL ? 'right-7' : 'left-1')}`} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-gray-700">📍 {t.shareLocation}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">{t.shareLocationDesc}</p>
-                  </div>
-                </div>
-
-                {locationShared && (
-                  <div className="bg-green-50 border border-green-200 rounded-xl p-3 flex items-center gap-2">
-                    <span className="text-green-600 flex-shrink-0">📍</span>
-                    <span className="text-green-700 text-sm font-medium">
-                      {isRTL ? 'تم مشاركة الموقع: 31.9539° N, 35.9106° E' : 'Location shared: 31.9539° N, 35.9106° E'}
-                    </span>
-                  </div>
-                )}
-
-                <button
-                  onClick={() => {
-                    if (orderForm.phone && orderForm.cylinders && orderForm.address) {
-                      setOrderSent(true);
-                    }
-                  }}
-                  disabled={!orderForm.phone || !orderForm.cylinders || !orderForm.address}
-                  className="w-full gradient-green text-white font-black py-4 rounded-2xl card-shadow hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-base"
-                >
-                  🔥 {t.sendOrder}
-                </button>
-              </div>
-            </div>
-          )}
+          </div>
         </div>
         <BottomNav view={view} setView={setView} isRTL={isRTL} role={role} />
       </div>
@@ -707,47 +766,31 @@ export default function Home() {
         <TopBar title={t.complaintsTitle} isRTL={isRTL} switchLangLabel={t.switchLanguage} onToggleLang={toggleLang} onExit={handleExit} />
 
         <div className="px-6 py-6">
-          {complaintSent ? (
-            <div className="bg-white rounded-2xl p-8 card-shadow text-center">
-              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-4xl">✅</span>
+          <div className="bg-white rounded-2xl p-6 card-shadow">
+            <p className="text-gray-500 text-sm mb-6 leading-relaxed">{t.complaintsSubtitle}</p>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1.5">{t.complaintMessage} *</label>
+                <textarea
+                  placeholder={t.complaintPlaceholder}
+                  value={complaintText}
+                  onChange={e => setComplaintText(e.target.value)}
+                  rows={6}
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100 text-sm resize-none leading-relaxed"
+                />
+                <p className={`text-xs mt-1 ${complaintText.length > 450 ? 'text-red-400' : 'text-gray-400'} ${isRTL ? 'text-left' : 'text-right'}`}>
+                  {complaintText.length}/500
+                </p>
               </div>
-              <h2 className="text-xl font-black text-gray-800 mb-2">{t.complaintSuccess}</h2>
-              <p className="text-gray-500 text-sm mb-6 leading-relaxed">{t.complaintSuccessDesc}</p>
               <button
-                onClick={() => { setComplaintSent(false); setComplaintText(''); }}
-                className="w-full bg-green-600 text-white font-bold py-3 rounded-xl hover:bg-green-700 transition"
+                onClick={handleSubmitComplaint}
+                disabled={!complaintText.trim()}
+                className="w-full gradient-green text-white font-black py-4 rounded-2xl card-shadow hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isRTL ? '+ شكوى جديدة' : '+ New Complaint'}
+                {t.sendComplaint}
               </button>
             </div>
-          ) : (
-            <div className="bg-white rounded-2xl p-6 card-shadow">
-              <p className="text-gray-500 text-sm mb-6 leading-relaxed">{t.complaintsSubtitle}</p>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-1.5">{t.complaintMessage} *</label>
-                  <textarea
-                    placeholder={t.complaintPlaceholder}
-                    value={complaintText}
-                    onChange={e => setComplaintText(e.target.value)}
-                    rows={6}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100 text-sm resize-none leading-relaxed"
-                  />
-                  <p className={`text-xs mt-1 ${complaintText.length > 450 ? 'text-red-400' : 'text-gray-400'} ${isRTL ? 'text-left' : 'text-right'}`}>
-                    {complaintText.length}/500
-                  </p>
-                </div>
-                <button
-                  onClick={() => { if (complaintText.trim()) setComplaintSent(true); }}
-                  disabled={!complaintText.trim()}
-                  className="w-full gradient-green text-white font-black py-4 rounded-2xl card-shadow hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {t.sendComplaint}
-                </button>
-              </div>
-            </div>
-          )}
+          </div>
         </div>
         <BottomNav view={view} setView={setView} isRTL={isRTL} role={role} />
       </div>
@@ -756,31 +799,26 @@ export default function Home() {
 
   // ─── ACCOUNT ──────────────────────────────────────────────────────────────────
   if (view === 'account') {
-    const myOrders = [
-      { id: 1, cylinders: 2, address: 'Amman, Khalda', status: 'Delivered', date: '2024-03-01' },
-      { id: 2, cylinders: 1, address: 'Amman, Khalda', status: 'Accepted', date: '2024-03-04' },
-    ];
+    // Show all orders in the system
+    const myOrders = orders;
 
     return (
       <div className="min-h-screen bg-gray-50 pb-20" dir={isRTL ? 'rtl' : 'ltr'}>
         <TopBar title={t.accountTitle} isRTL={isRTL} switchLangLabel={t.switchLanguage} onToggleLang={toggleLang} onExit={handleExit} />
 
         <div className="px-6 py-6 space-y-4">
-          {/* Profile card */}
           <div className="bg-white rounded-2xl p-6 card-shadow">
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
                 <span className="text-3xl">👤</span>
               </div>
               <div>
-                <h2 className="font-black text-gray-800 text-lg">Ahmad Ali</h2>
-                <p className="text-gray-500 text-sm">ahmad.ali@gmail.com</p>
-                <p className="text-gray-500 text-sm">0791234567</p>
+                <h2 className="font-black text-gray-800 text-lg">{isRTL ? 'عميل' : 'Customer'}</h2>
+                <p className="text-gray-500 text-sm">{isRTL ? 'حساب Google' : 'Google Account'}</p>
               </div>
             </div>
           </div>
 
-          {/* My orders */}
           <div className="bg-white rounded-2xl p-6 card-shadow">
             <h3 className="font-black text-gray-800 mb-4">{t.myOrders}</h3>
             {myOrders.length === 0 ? (
@@ -822,33 +860,58 @@ export default function Home() {
         <TopBar title={t.sellerTitle} isRTL={isRTL} switchLangLabel={t.switchLanguage} onToggleLang={toggleLang} onExit={handleExit} />
 
         <div className="px-6 py-6">
-          {/* Stats */}
           <div className="grid grid-cols-3 gap-3 mb-6">
             <div className="bg-white rounded-2xl p-4 card-shadow text-center">
-              <p className="text-2xl font-black text-amber-500">{[]}</p>
+              <p className="text-2xl font-black text-amber-500">{availableOrders.length}</p>
               <p className="text-xs text-gray-500 mt-1 font-medium">{isRTL ? 'متاح' : 'Available'}</p>
             </div>
             <div className="bg-white rounded-2xl p-4 card-shadow text-center">
-              <p className="text-2xl font-black text-green-600">{acceptedOrders.length}</p>
+              <p className="text-2xl font-black text-green-600">{sellerAcceptedOrders.filter(o => o.status === 'accepted').length}</p>
               <p className="text-xs text-gray-500 mt-1 font-medium">{isRTL ? 'مقبول' : 'Accepted'}</p>
             </div>
             <div className="bg-white rounded-2xl p-4 card-shadow text-center">
-              <p className="text-2xl font-black text-blue-600">{deliveredOrders.length}</p>
+              <p className="text-2xl font-black text-blue-600">{sellerAcceptedOrders.filter(o => o.status === 'delivered').length}</p>
               <p className="text-xs text-gray-500 mt-1 font-medium">{isRTL ? 'موصّل' : 'Delivered'}</p>
             </div>
           </div>
 
           <p className="text-gray-500 text-sm mb-4 leading-relaxed">{t.sellerSubtitle}</p>
 
-          {[].length === 0 ? (
+          {availableOrders.length === 0 ? (
             <div className="bg-white rounded-2xl p-10 card-shadow text-center">
               <span className="text-5xl">📭</span>
               <p className="text-gray-500 mt-4 font-medium">{t.noAvailableOrders}</p>
             </div>
           ) : (
-            <div className="bg-white rounded-2xl p-10 card-shadow text-center">
-              <span className="text-5xl">📭</span>
-              <p className="text-gray-500 mt-4 font-medium">{t.noAvailableOrders}</p>
+            <div className="space-y-3">
+              {availableOrders.map(order => (
+                <div key={order.id} className="bg-white rounded-2xl p-4 card-shadow">
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <p className="font-black text-gray-800">🔥 {order.cylinders} {t.cylinders}</p>
+                      <p className="text-gray-500 text-xs mt-1">{order.address}</p>
+                      <p className="text-gray-400 text-xs">📞 {order.customerPhone}</p>
+                    </div>
+                    <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${getStatusStyle(order.status)}`}>
+                      {getStatusLabel(order.status)}
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleAcceptOrder(order.id)}
+                      className="flex-1 bg-green-600 text-white font-bold py-2.5 rounded-xl hover:bg-green-700 transition text-sm"
+                    >
+                      ✓ {isRTL ? 'قبول' : 'Accept'}
+                    </button>
+                    <button
+                      onClick={() => handleRejectOrder(order.id)}
+                      className="flex-1 bg-red-500 text-white font-bold py-2.5 rounded-xl hover:bg-red-600 transition text-sm"
+                    >
+                      ✕ {isRTL ? 'رفض' : 'Reject'}
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>
@@ -864,17 +927,35 @@ export default function Home() {
         <TopBar title={t.myAcceptedOrders} isRTL={isRTL} switchLangLabel={t.switchLanguage} onToggleLang={toggleLang} onExit={handleExit} />
 
         <div className="px-6 py-6">
-          {[].length === 0 ? (
+          {sellerAcceptedOrders.length === 0 ? (
             <div className="bg-white rounded-2xl p-10 card-shadow text-center">
               <span className="text-5xl">📦</span>
               <p className="text-gray-500 mt-4 font-medium">{isRTL ? 'لا توجد طلبات مقبولة بعد' : 'No accepted orders yet'}</p>
-              <p className="text-gray-400 text-sm mt-1">{isRTL ? 'اقبل طلبات من لوحة الطلبات المتاحة' : 'Accept orders from the available orders tab'}</p>
             </div>
           ) : (
-            <div className="bg-white rounded-2xl p-10 card-shadow text-center">
-              <span className="text-5xl">📦</span>
-              <p className="text-gray-500 mt-4 font-medium">{isRTL ? 'لا توجد طلبات مقبولة بعد' : 'No accepted orders yet'}</p>
-              <p className="text-gray-400 text-sm mt-1">{isRTL ? 'اقبل طلبات من لوحة الطلبات المتاحة' : 'Accept orders from the available orders tab'}</p>
+            <div className="space-y-3">
+              {sellerAcceptedOrders.map(order => (
+                <div key={order.id} className="bg-white rounded-2xl p-4 card-shadow">
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <p className="font-black text-gray-800">🔥 {order.cylinders} {t.cylinders}</p>
+                      <p className="text-gray-500 text-xs mt-1">{order.address}</p>
+                      <p className="text-gray-400 text-xs">📞 {order.customerPhone}</p>
+                    </div>
+                    <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${getStatusStyle(order.status)}`}>
+                      {getStatusLabel(order.status)}
+                    </span>
+                  </div>
+                  {order.status === 'accepted' && (
+                    <button
+                      onClick={() => handleMarkDelivered(order.id)}
+                      className="w-full bg-blue-600 text-white font-bold py-2.5 rounded-xl hover:bg-blue-700 transition text-sm"
+                    >
+                      ✓ {isRTL ? 'تم التوصيل' : 'Mark as Delivered'}
+                    </button>
+                  )}
+                </div>
+              ))}
             </div>
           )}
         </div>
@@ -887,7 +968,6 @@ export default function Home() {
   if (view === 'admin') {
     return (
       <div className="min-h-screen bg-gray-50" dir={isRTL ? 'rtl' : 'ltr'}>
-        {/* Admin Header */}
         <div className="bg-gray-900 px-6 pt-10 pb-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
@@ -913,7 +993,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Admin Tabs */}
           <div className="flex gap-1 bg-gray-800 rounded-xl p-1">
             {[
               { id: 'dashboard', label: isRTL ? 'الرئيسية' : 'Dashboard', icon: '📊' },
@@ -933,15 +1012,14 @@ export default function Home() {
         </div>
 
         <div className="px-6 py-6 pb-10">
-          {/* Dashboard Tab */}
           {adminTab === 'dashboard' && (
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { label: t.totalOrders, value: '127', icon: '📦', iconBg: 'bg-green-500', bg: 'bg-green-50', border: 'border-green-100' },
-                  { label: t.activeSellers, value: '3', icon: '🛵', iconBg: 'bg-blue-500', bg: 'bg-blue-50', border: 'border-blue-100' },
-                  { label: t.complaintsCount, value: '8', icon: '📝', iconBg: 'bg-orange-500', bg: 'bg-orange-50', border: 'border-orange-100' },
-                  { label: isRTL ? 'تم التوصيل' : 'Delivered', value: '98', icon: '✅', iconBg: 'bg-purple-500', bg: 'bg-purple-50', border: 'border-purple-100' },
+                  { label: t.totalOrders, value: orders.length.toString(), icon: '📦', iconBg: 'bg-green-500', bg: 'bg-green-50', border: 'border-green-100' },
+                  { label: t.activeSellers, value: sellers.length.toString(), icon: '🛵', iconBg: 'bg-blue-500', bg: 'bg-blue-50', border: 'border-blue-100' },
+                  { label: t.complaintsCount, value: complaints.filter(c => c.status === 'pending').length.toString(), icon: '📝', iconBg: 'bg-orange-500', bg: 'bg-orange-50', border: 'border-orange-100' },
+                  { label: isRTL ? 'تم التوصيل' : 'Delivered', value: orders.filter(o => o.status === 'delivered').length.toString(), icon: '✅', iconBg: 'bg-purple-500', bg: 'bg-purple-50', border: 'border-purple-100' },
                 ].map(stat => (
                   <div key={stat.label} className={`${stat.bg} ${stat.border} border rounded-2xl p-5 card-shadow`}>
                     <div className={`w-10 h-10 ${stat.iconBg} rounded-xl flex items-center justify-center mb-3`}>
@@ -955,14 +1033,27 @@ export default function Home() {
 
               <div className="bg-white rounded-2xl p-5 card-shadow">
                 <h3 className="font-black text-gray-800 mb-4">{isRTL ? 'آخر الطلبات' : 'Recent Orders'}</h3>
-                <div className="space-y-3">
+                {orders.length === 0 ? (
                   <p className="text-gray-400 text-sm text-center py-4">{isRTL ? 'لا توجد طلبات' : 'No orders yet'}</p>
-                </div>
+                ) : (
+                  <div className="space-y-3">
+                    {orders.slice(-5).reverse().map(order => (
+                      <div key={order.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                        <div>
+                          <p className="font-bold text-gray-800 text-sm">🔥 {order.cylinders} {t.cylinders}</p>
+                          <p className="text-gray-500 text-xs">{order.address}</p>
+                        </div>
+                        <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${getStatusStyle(order.status)}`}>
+                          {getStatusLabel(order.status)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}
 
-          {/* Sellers Tab */}
           {adminTab === 'sellers' && (
             <div className="space-y-4">
               <button
@@ -978,29 +1069,36 @@ export default function Home() {
                   <div className="space-y-3">
                     <input
                       type="text"
-                      placeholder={t.sellerName}
+                      placeholder={t.sellerName || 'Name'}
+                      value={newSeller.name}
+                      onChange={e => setNewSeller(p => ({ ...p, name: e.target.value }))}
                       className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100"
                     />
                     <input
                       type="tel"
-                      placeholder={t.sellerPhone}
+                      placeholder={t.sellerPhone || 'Phone'}
+                      value={newSeller.phone}
+                      onChange={e => setNewSeller(p => ({ ...p, phone: e.target.value }))}
                       className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100"
                       dir="ltr"
                     />
                     <input
                       type="password"
-                      placeholder={t.sellerPassword}
+                      placeholder={t.sellerPassword || 'Password'}
+                      value={newSeller.password}
+                      onChange={e => setNewSeller(p => ({ ...p, password: e.target.value }))}
                       className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100"
                     />
                     <div className="flex gap-3">
                       <button
-                        onClick={() => setShowAddSeller(false)}
-                        className="flex-1 bg-green-600 text-white font-bold py-3 rounded-xl hover:bg-green-700 transition text-sm"
+                        onClick={handleAddSeller}
+                        disabled={!newSeller.name.trim() || !newSeller.phone.trim() || !newSeller.password.trim()}
+                        className="flex-1 bg-green-600 text-white font-bold py-3 rounded-xl hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                       >
                         {isRTL ? '💾 حفظ' : '💾 Save'}
                       </button>
                       <button
-                        onClick={() => setShowAddSeller(false)}
+                        onClick={() => { setShowAddSeller(false); setNewSeller({ name: '', phone: '', password: '' }); }}
                         className="flex-1 bg-gray-100 text-gray-600 font-bold py-3 rounded-xl hover:bg-gray-200 transition text-sm"
                       >
                         {isRTL ? 'إلغاء' : 'Cancel'}
@@ -1010,21 +1108,81 @@ export default function Home() {
                 </div>
               )}
 
-              <p className="text-gray-400 text-sm text-center py-4">{isRTL ? 'لا يوجد بائعون' : 'No sellers yet'}</p>
+              {sellers.length === 0 ? (
+                <p className="text-gray-400 text-sm text-center py-4">{isRTL ? 'لا يوجد بائعون' : 'No sellers yet'}</p>
+              ) : (
+                <div className="space-y-3">
+                  {sellers.map(seller => (
+                    <div key={seller.id} className="bg-white rounded-2xl p-4 card-shadow">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                          <span className="text-xl">🛵</span>
+                        </div>
+                        <div>
+                          <p className="font-bold text-gray-800">{seller.name}</p>
+                          <p className="text-gray-500 text-xs">📞 {seller.phone}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
-          {/* Complaints Tab */}
           {adminTab === 'complaints' && (
             <div className="space-y-4">
-              <p className="text-gray-400 text-sm text-center py-4">{isRTL ? 'لا توجد شكاوى' : 'No complaints yet'}</p>
+              {complaints.length === 0 ? (
+                <p className="text-gray-400 text-sm text-center py-4">{isRTL ? 'لا توجد شكاوى' : 'No complaints yet'}</p>
+              ) : (
+                <div className="space-y-3">
+                  {complaints.map(complaint => (
+                    <div key={complaint.id} className={`bg-white rounded-2xl p-4 card-shadow ${complaint.status === 'resolved' ? 'opacity-60' : ''}`}>
+                      <div className="flex items-start justify-between mb-2">
+                        <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${getStatusStyle(complaint.status)}`}>
+                          {getStatusLabel(complaint.status)}
+                        </span>
+                        <span className="text-gray-400 text-xs">{complaint.date}</span>
+                      </div>
+                      <p className="text-gray-700 text-sm mb-3">{complaint.message}</p>
+                      {complaint.status === 'pending' && (
+                        <button
+                          onClick={() => handleResolveComplaint(complaint.id)}
+                          className="w-full bg-green-600 text-white font-bold py-2 rounded-xl hover:bg-green-700 transition text-sm"
+                        >
+                          ✓ {isRTL ? 'تم الحل' : 'Mark as Resolved'}
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
-          {/* Orders Tab */}
           {adminTab === 'orders' && (
             <div className="space-y-4">
-              <p className="text-gray-400 text-sm text-center py-4">{isRTL ? 'لا توجد طلبات' : 'No orders yet'}</p>
+              {orders.length === 0 ? (
+                <p className="text-gray-400 text-sm text-center py-4">{isRTL ? 'لا توجد طلبات' : 'No orders yet'}</p>
+              ) : (
+                <div className="space-y-3">
+                  {orders.map(order => (
+                    <div key={order.id} className="bg-white rounded-2xl p-4 card-shadow">
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <p className="font-bold text-gray-800">🔥 {order.cylinders} {t.cylinders}</p>
+                          <p className="text-gray-500 text-xs mt-1">{order.address}</p>
+                          <p className="text-gray-400 text-xs">📞 {order.customerPhone}</p>
+                        </div>
+                        <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${getStatusStyle(order.status)}`}>
+                          {getStatusLabel(order.status)}
+                        </span>
+                      </div>
+                      <p className="text-gray-400 text-xs">{order.date}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
