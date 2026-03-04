@@ -11,6 +11,7 @@
 - [x] Improved logo with green gradient branding
 - [x] Made green header areas smaller (not covering text)
 - [x] Fixed app sizing (restored proper proportions after shrinking too much)
+- [x] Fixed login page margin (reduced -mt-20 to -mt-12 to show all login options)
 
 ## Current Structure
 
@@ -45,6 +46,7 @@
 | 2026-03-04 | Updated AppLogo to use green gradient (matching app brand) instead of white box |
 | 2026-03-04 | Made green header areas smaller (user request) |
 | 2026-03-04 | Fixed app sizing after shrinking too much - restored proper proportions |
+| 2026-03-04 | Fixed login page margin (reduced -mt-20 to -mt-12 to show all login options) |
 
 ## Design Notes
 
