@@ -41,30 +41,6 @@ export default function Home() {
   const toggleLang = () => setLang(l => l === 'en' ? 'ar' : 'en');
   const handleExit = () => { setRole(null); setView('login'); };
 
-  // Sample data
-  const sampleOrders = [
-    { id: 1, phone: '0791234567', cylinders: 2, address: 'Amman, Khalda District', status: 'Pending', date: '2024-03-04', customer: 'Ahmad Ali' },
-    { id: 2, phone: '0799876543', cylinders: 1, address: 'Zarqa, New Zarqa', status: 'Accepted', date: '2024-03-04', customer: 'Sara Hassan' },
-    { id: 3, phone: '0785551234', cylinders: 3, address: 'Irbid, University Street', status: 'Delivered', date: '2024-03-03', customer: 'Mohammed Khalil' },
-    { id: 4, phone: '0776543210', cylinders: 2, address: 'Aqaba, Downtown', status: 'Pending', date: '2024-03-04', customer: 'Fatima Nasser' },
-  ];
-
-  const sampleSellers = [
-    { id: 1, name: 'Khalid Gas', phone: '0791111111', status: 'active', orders: 45 },
-    { id: 2, name: 'Amman Gas Co.', phone: '0792222222', status: 'active', orders: 32 },
-    { id: 3, name: 'Quick Gas', phone: '0793333333', status: 'inactive', orders: 18 },
-    { id: 4, name: 'Jordan Gas', phone: '0794444444', status: 'active', orders: 67 },
-  ];
-
-  const sampleComplaints = [
-    { id: 1, customer: 'Ahmad Ali', message: 'Delivery was late by 3 hours', date: '2024-03-04', status: 'pending' },
-    { id: 2, customer: 'Sara Hassan', message: 'Wrong number of cylinders delivered', date: '2024-03-03', status: 'resolved' },
-    { id: 3, customer: 'Mohammed Khalil', message: 'Seller was rude', date: '2024-03-02', status: 'pending' },
-  ];
-
-  const pendingOrders = sampleOrders.filter(o => o.status === 'Pending' && !acceptedOrders.includes(o.id));
-  const myAccepted = sampleOrders.filter(o => acceptedOrders.includes(o.id));
-
   const handleAcceptOrder = (id: number) => setAcceptedOrders(prev => [...prev, id]);
   const handleMarkDelivered = (id: number) => setDeliveredOrders(prev => [...prev, id]);
 
@@ -795,7 +771,7 @@ export default function Home() {
           {/* Stats */}
           <div className="grid grid-cols-3 gap-3 mb-6">
             <div className="bg-white rounded-2xl p-4 card-shadow text-center">
-              <p className="text-2xl font-black text-amber-500">{pendingOrders.length}</p>
+              <p className="text-2xl font-black text-amber-500">{[]}</p>
               <p className="text-xs text-gray-500 mt-1 font-medium">{isRTL ? 'متاح' : 'Available'}</p>
             </div>
             <div className="bg-white rounded-2xl p-4 card-shadow text-center">
@@ -810,44 +786,15 @@ export default function Home() {
 
           <p className="text-gray-500 text-sm mb-4 leading-relaxed">{t.sellerSubtitle}</p>
 
-          {pendingOrders.length === 0 ? (
+          {[].length === 0 ? (
             <div className="bg-white rounded-2xl p-10 card-shadow text-center">
               <span className="text-5xl">📭</span>
               <p className="text-gray-500 mt-4 font-medium">{t.noAvailableOrders}</p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {pendingOrders.map(order => (
-                <div key={order.id} className="bg-white rounded-2xl p-5 card-shadow">
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <p className="font-black text-gray-800">📞 {order.phone}</p>
-                      <p className="text-gray-500 text-sm mt-0.5">📍 {order.address}</p>
-                      <p className="text-gray-400 text-xs mt-0.5">{order.customer}</p>
-                    </div>
-                    <span className="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-1 rounded-full">
-                      {getStatusLabel('Pending')}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 mb-4">
-                    <span className="bg-green-100 text-green-700 text-sm font-bold px-3 py-1 rounded-full">
-                      🔥 {order.cylinders} {t.cylinders}
-                    </span>
-                    <span className="text-gray-400 text-xs">{order.date}</span>
-                  </div>
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => handleAcceptOrder(order.id)}
-                      className="flex-1 bg-green-600 text-white font-bold py-2.5 rounded-xl hover:bg-green-700 transition text-sm"
-                    >
-                      ✓ {t.acceptOrder}
-                    </button>
-                    <button className="flex-1 bg-red-50 text-red-600 font-bold py-2.5 rounded-xl hover:bg-red-100 transition text-sm border border-red-100">
-                      ✗ {t.rejectOrder}
-                    </button>
-                  </div>
-                </div>
-              ))}
+            <div className="bg-white rounded-2xl p-10 card-shadow text-center">
+              <span className="text-5xl">📭</span>
+              <p className="text-gray-500 mt-4 font-medium">{t.noAvailableOrders}</p>
             </div>
           )}
         </div>
@@ -863,52 +810,17 @@ export default function Home() {
         <TopBar title={t.myAcceptedOrders} isRTL={isRTL} switchLangLabel={t.switchLanguage} onToggleLang={toggleLang} onExit={handleExit} />
 
         <div className="px-6 py-6">
-          {myAccepted.length === 0 ? (
+          {[].length === 0 ? (
             <div className="bg-white rounded-2xl p-10 card-shadow text-center">
               <span className="text-5xl">📦</span>
               <p className="text-gray-500 mt-4 font-medium">{isRTL ? 'لا توجد طلبات مقبولة بعد' : 'No accepted orders yet'}</p>
               <p className="text-gray-400 text-sm mt-1">{isRTL ? 'اقبل طلبات من لوحة الطلبات المتاحة' : 'Accept orders from the available orders tab'}</p>
             </div>
           ) : (
-            <div className="space-y-4">
-              {myAccepted.map(order => {
-                const isDelivered = deliveredOrders.includes(order.id);
-                return (
-                  <div key={order.id} className="bg-white rounded-2xl p-5 card-shadow">
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <p className="font-black text-gray-800">📞 {order.phone}</p>
-                        <p className="text-gray-500 text-sm mt-0.5">📍 {order.address}</p>
-                        <p className="text-gray-400 text-xs mt-0.5">{order.customer}</p>
-                      </div>
-                      <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${isDelivered ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`}>
-                        {isDelivered ? getStatusLabel('Delivered') : getStatusLabel('Accepted')}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 mb-4">
-                      <span className="bg-green-100 text-green-700 text-sm font-bold px-3 py-1 rounded-full">
-                        🔥 {order.cylinders} {t.cylinders}
-                      </span>
-                      <span className="text-gray-400 text-xs">{order.date}</span>
-                    </div>
-                    {!isDelivered && (
-                      <button
-                        onClick={() => handleMarkDelivered(order.id)}
-                        className="w-full bg-blue-600 text-white font-bold py-2.5 rounded-xl hover:bg-blue-700 transition text-sm"
-                      >
-                        ✓ {t.markDelivered}
-                      </button>
-                    )}
-                    {isDelivered && (
-                      <div className="bg-blue-50 rounded-xl p-3 text-center">
-                        <p className="text-blue-700 text-sm font-bold">
-                          ✅ {isRTL ? 'تم التوصيل بنجاح' : 'Delivered successfully'}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+            <div className="bg-white rounded-2xl p-10 card-shadow text-center">
+              <span className="text-5xl">📦</span>
+              <p className="text-gray-500 mt-4 font-medium">{isRTL ? 'لا توجد طلبات مقبولة بعد' : 'No accepted orders yet'}</p>
+              <p className="text-gray-400 text-sm mt-1">{isRTL ? 'اقبل طلبات من لوحة الطلبات المتاحة' : 'Accept orders from the available orders tab'}</p>
             </div>
           )}
         </div>
@@ -990,17 +902,7 @@ export default function Home() {
               <div className="bg-white rounded-2xl p-5 card-shadow">
                 <h3 className="font-black text-gray-800 mb-4">{isRTL ? 'آخر الطلبات' : 'Recent Orders'}</h3>
                 <div className="space-y-3">
-                  {sampleOrders.slice(0, 3).map(order => (
-                    <div key={order.id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
-                      <div>
-                        <p className="font-bold text-gray-800 text-sm">{order.customer}</p>
-                        <p className="text-gray-400 text-xs">{order.cylinders} {t.cylinders} • {order.date}</p>
-                      </div>
-                      <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${getStatusStyle(order.status)}`}>
-                        {getStatusLabel(order.status)}
-                      </span>
-                    </div>
-                  ))}
+                  <p className="text-gray-400 text-sm text-center py-4">{isRTL ? 'لا توجد طلبات' : 'No orders yet'}</p>
                 </div>
               </div>
             </div>
@@ -1054,80 +956,21 @@ export default function Home() {
                 </div>
               )}
 
-              {sampleSellers.map(seller => (
-                <div key={seller.id} className="bg-white rounded-2xl p-5 card-shadow">
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <p className="font-black text-gray-800">{seller.name}</p>
-                      <p className="text-gray-500 text-sm">📞 {seller.phone}</p>
-                      <p className="text-gray-400 text-xs mt-1">{seller.orders} {isRTL ? 'طلب مكتمل' : 'completed orders'}</p>
-                    </div>
-                    <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${seller.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-                      {seller.status === 'active' ? t.active : t.inactive}
-                    </span>
-                  </div>
-                  <div className="flex gap-2">
-                    <button className="flex-1 bg-blue-50 text-blue-600 text-xs font-bold py-2 rounded-lg hover:bg-blue-100 transition">
-                      ✏️ {t.editSeller}
-                    </button>
-                    <button className={`flex-1 text-xs font-bold py-2 rounded-lg transition ${seller.status === 'active' ? 'bg-orange-50 text-orange-600 hover:bg-orange-100' : 'bg-green-50 text-green-600 hover:bg-green-100'}`}>
-                      {seller.status === 'active' ? `⏸ ${t.deactivateSeller}` : `▶ ${t.activateSeller}`}
-                    </button>
-                    <button className="flex-1 bg-red-50 text-red-600 text-xs font-bold py-2 rounded-lg hover:bg-red-100 transition">
-                      🗑 {t.deleteSeller}
-                    </button>
-                  </div>
-                </div>
-              ))}
+              <p className="text-gray-400 text-sm text-center py-4">{isRTL ? 'لا يوجد بائعون' : 'No sellers yet'}</p>
             </div>
           )}
 
           {/* Complaints Tab */}
           {adminTab === 'complaints' && (
             <div className="space-y-4">
-              {sampleComplaints.map(complaint => (
-                <div key={complaint.id} className="bg-white rounded-2xl p-5 card-shadow">
-                  <div className="flex items-start justify-between mb-2">
-                    <p className="font-black text-gray-800 text-sm">{complaint.customer}</p>
-                    <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${getStatusStyle(complaint.status)}`}>
-                      {getStatusLabel(complaint.status)}
-                    </span>
-                  </div>
-                  <p className="text-gray-600 text-sm mb-2 leading-relaxed">{complaint.message}</p>
-                  <p className="text-gray-400 text-xs mb-3">{complaint.date}</p>
-                  {complaint.status === 'pending' && (
-                    <button className="w-full bg-green-50 text-green-700 font-bold py-2 rounded-xl text-sm hover:bg-green-100 transition">
-                      ✓ {t.markResolved}
-                    </button>
-                  )}
-                </div>
-              ))}
+              <p className="text-gray-400 text-sm text-center py-4">{isRTL ? 'لا توجد شكاوى' : 'No complaints yet'}</p>
             </div>
           )}
 
           {/* Orders Tab */}
           {adminTab === 'orders' && (
             <div className="space-y-4">
-              {sampleOrders.map(order => (
-                <div key={order.id} className="bg-white rounded-2xl p-5 card-shadow">
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <p className="font-black text-gray-800 text-sm">{order.customer}</p>
-                      <p className="text-gray-500 text-xs">📞 {order.phone}</p>
-                    </div>
-                    <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${getStatusStyle(order.status)}`}>
-                      {getStatusLabel(order.status)}
-                    </span>
-                  </div>
-                  <p className="text-gray-500 text-sm">📍 {order.address}</p>
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className="bg-green-100 text-green-700 text-xs font-bold px-2.5 py-1 rounded-full">
-                      🔥 {order.cylinders} {t.cylinders}
-                    </span>
-                    <span className="text-gray-400 text-xs">{order.date}</span>
-                  </div>
-                </div>
-              ))}
+              <p className="text-gray-400 text-sm text-center py-4">{isRTL ? 'لا توجد طلبات' : 'No orders yet'}</p>
             </div>
           )}
         </div>
