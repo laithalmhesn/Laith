@@ -87,3 +87,4 @@ export async function GET() {
 | Initial | Template created with base setup |
 | 2026-03-04 | Built GasNow Jordan - full bilingual gas delivery app UI |
 | 2026-03-04 | Fixed admin login (email-only, zerogoast@gmail.com), improved logo, polished UI text and design |
+| 2026-03-04 | Updated AppLogo to use green gradient (matching app brand) instead of white box |
