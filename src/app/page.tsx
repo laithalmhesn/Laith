@@ -127,25 +127,25 @@ export default function Home() {
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/5 rounded-full translate-y-48 -translate-x-48" />
         <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-white/5 rounded-full -translate-x-16 -translate-y-16" />
 
-        <div className="relative z-10 flex flex-col items-center text-center px-8">
+        <div className="relative z-10 flex flex-col items-center text-center px-4 pt-8">
           {/* Logo */}
-          <div className="animate-bounce-subtle mb-6">
+          <div className="animate-bounce-subtle mb-4">
             <AppLogo size="lg" />
           </div>
 
           {/* App name */}
-          <h1 className="text-4xl font-black text-white mb-1 tracking-tight">
+          <h1 className="text-3xl font-black text-white mb-1 tracking-tight">
             {isRTL ? 'غاز ناو' : 'GasNow'}
           </h1>
-          <p className="text-green-200 text-base font-semibold mb-1">
+          <p className="text-green-200 text-sm font-semibold mb-1">
             {isRTL ? 'الأردن' : 'Jordan'}
           </p>
-          <p className="text-green-100 text-sm mb-10 max-w-xs">
+          <p className="text-green-100 text-xs mb-6 max-w-xs">
             {t.appTagline}
           </p>
 
           {/* Language selector */}
-          <div className="bg-white/15 backdrop-blur-sm rounded-2xl p-5 mb-8 w-full max-w-xs border border-white/20">
+          <div className="bg-white/15 backdrop-blur-sm rounded-2xl p-4 mb-6 w-full max-w-xs border border-white/20">
             <p className="text-white/90 text-sm mb-3 font-semibold text-center">
               {isRTL ? 'اختر اللغة' : 'Choose Language'}
             </p>
@@ -185,7 +185,7 @@ export default function Home() {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
         {/* Header */}
-        <div className="gradient-green px-6 pt-6 pb-8 text-center relative overflow-hidden">
+        <div className="gradient-green px-6 pt-4 pb-4 text-center relative overflow-hidden">
           <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-20 translate-x-20" />
           <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full translate-y-16 -translate-x-16" />
           <div className="absolute top-4 right-4 z-10">
@@ -202,7 +202,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="flex-1 px-6 -mt-4 pb-8">
+        <div className="flex-1 px-6 -mt-6 pb-6">
           {!loginType ? (
             <div className="space-y-4">
               {/* Customer Login */}
