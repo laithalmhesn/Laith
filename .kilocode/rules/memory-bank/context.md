@@ -12,7 +12,7 @@
 - [x] Made green header areas smaller (not covering text)
 - [x] Fixed app sizing (restored proper proportions after shrinking too much)
 - [x] Fixed login page margin (reduced -mt-20 to -mt-12 to show all login options)
-- [x] Removed fake sample data (sampleOrders, sampleSellers, sampleComplaints)
+- [x] Removed seller self-registration - only admins can create seller accounts through admin panel
 
 ## Current Structure
 
