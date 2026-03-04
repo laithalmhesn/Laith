@@ -130,14 +130,14 @@ export default function Home() {
         <div className="relative z-10 flex flex-col items-center text-center px-1">
           {/* Logo */}
           <div className="animate-bounce-subtle">
-            <AppLogo size="sm" />
+            <AppLogo size="md" />
           </div>
 
           {/* App name */}
-          <h1 className="text-base font-black text-white mb-0 tracking-tight">
+          <h1 className="text-2xl font-black text-white mb-1 tracking-tight">
             {isRTL ? 'غاز ناو' : 'GasNow'}
           </h1>
-          <p className="text-green-200 text-[10px] font-semibold mb-0">
+          <p className="text-green-200 text-sm font-semibold mb-1">
             {isRTL ? 'الأردن' : 'Jordan'}
           </p>
           <p className="text-green-100 text-xs mb-2 max-w-xs">
@@ -145,20 +145,20 @@ export default function Home() {
           </p>
 
           {/* Language selector */}
-          <div className="bg-white/15 backdrop-blur-sm rounded-lg p-1.5 mb-2 w-full max-w-xs border border-white/20">
-            <p className="text-white/90 text-xs mb-2 font-semibold text-center">
+          <div className="bg-white/15 backdrop-blur-sm rounded-lg p-3 mb-3 w-full max-w-xs border border-white/20">
+            <p className="text-white/90 text-sm mb-2 font-semibold text-center">
               {isRTL ? 'اختر اللغة' : 'Choose Language'}
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setLang('en')}
-                className={`flex-1 py-2 rounded-lg font-bold text-xs transition-all ${lang === 'en' ? 'bg-white text-green-700 shadow-md' : 'bg-white/20 text-white hover:bg-white/30'}`}
+                className={`flex-1 py-2.5 rounded-lg font-bold text-sm transition-all ${lang === 'en' ? 'bg-white text-green-700 shadow-md' : 'bg-white/20 text-white hover:bg-white/30'}`}
               >
                 🇬🇧 English
               </button>
               <button
                 onClick={() => setLang('ar')}
-                className={`flex-1 py-2 rounded-lg font-bold text-xs transition-all ${lang === 'ar' ? 'bg-white text-green-700 shadow-md' : 'bg-white/20 text-white hover:bg-white/30'}`}
+                className={`flex-1 py-2.5 rounded-lg font-bold text-sm transition-all ${lang === 'ar' ? 'bg-white text-green-700 shadow-md' : 'bg-white/20 text-white hover:bg-white/30'}`}
               >
                 🇯🇴 العربية
               </button>
@@ -167,12 +167,12 @@ export default function Home() {
 
           <button
             onClick={() => setView('login')}
-            className="bg-white text-green-700 font-bold py-2 px-6 rounded-lg text-sm card-shadow-lg hover:bg-green-50 transition-all active:scale-95"
+            className="bg-white text-green-700 font-bold py-3 px-8 rounded-xl text-base card-shadow-lg hover:bg-green-50 transition-all active:scale-95"
           >
             {isRTL ? '🚀 ابدأ الآن' : '🚀 Get Started'}
           </button>
 
-          <p className="text-green-200/70 text-xs mt-1">
+          <p className="text-green-200/70 text-sm mt-2">
             {isRTL ? 'توصيل الغاز إلى بابك في الأردن' : 'Gas delivery to your door across Jordan'}
           </p>
         </div>
@@ -185,7 +185,7 @@ export default function Home() {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
         {/* Header */}
-        <div className="gradient-green px-1 py-0 text-center relative overflow-hidden">
+        <div className="gradient-green px-2 py-2 text-center relative overflow-hidden">
           <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-20 translate-x-20" />
           <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full translate-y-16 -translate-x-16" />
           <div className="absolute top-4 right-4 z-10">
@@ -202,7 +202,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="flex-1 px-1 -mt-36 pb-0">
+        <div className="flex-1 px-4 -mt-20 pb-6">
           {!loginType ? (
             <div className="space-y-4">
               {/* Customer Login */}
@@ -406,7 +406,7 @@ export default function Home() {
     return (
       <div className="min-h-screen bg-gray-50 pb-20" dir={isRTL ? 'rtl' : 'ltr'}>
         {/* Hero Header */}
-        <div className="gradient-green px-1 pt-0.5 pb-1 relative overflow-hidden">
+        <div className="gradient-green px-3 pt-4 pb-6 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -translate-y-24 translate-x-24" />
           <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full translate-y-16 -translate-x-16" />
           <div className="relative flex items-center justify-between mb-4">
@@ -435,7 +435,7 @@ export default function Home() {
           </button>
         </div>
 
-        <div className="px-1 -mt-1">
+        <div className="px-4 pt-4">
           {/* How it works */}
           <div className="bg-white rounded-2xl p-6 card-shadow mb-5">
             <h2 className="font-black text-gray-800 text-lg mb-5">{t.howItWorks}</h2>
