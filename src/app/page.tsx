@@ -134,10 +134,10 @@ export default function Home() {
           </div>
 
           {/* App name */}
-          <h1 className="text-xl font-black text-white mb-0.5 tracking-tight">
+          <h1 className="text-base font-black text-white mb-0 tracking-tight">
             {isRTL ? 'غاز ناو' : 'GasNow'}
           </h1>
-          <p className="text-green-200 text-xs font-semibold mb-0.5">
+          <p className="text-green-200 text-[10px] font-semibold mb-0">
             {isRTL ? 'الأردن' : 'Jordan'}
           </p>
           <p className="text-green-100 text-xs mb-2 max-w-xs">
