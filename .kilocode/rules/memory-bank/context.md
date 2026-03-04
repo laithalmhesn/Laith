@@ -1,84 +1,39 @@
-# Active Context: Next.js Starter Template
+# Active Context: GasNow Jordan - Gas Delivery App
 
 ## Current State
 
-**Template Status**: ✅ Ready for development
-
-The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. It's ready for AI-assisted expansion to build any type of application.
+**Project Status**: ✅ Live - Bilingual gas delivery app for Jordan
 
 ## Recently Completed
 
-- [x] Base Next.js 16 setup with App Router
-- [x] TypeScript configuration with strict mode
-- [x] Tailwind CSS 4 integration
-- [x] ESLint configuration
-- [x] Memory bank documentation
-- [x] Recipe system for common features
+- [x] Built GasNow Jordan - full bilingual gas delivery app UI
+- [x] Fixed admin login (email-only, zerogoast@gmail.com)
+- [x] Improved logo with green gradient branding
+- [x] Made green header areas smaller (not covering text)
+- [x] Fixed app sizing (restored proper proportions after shrinking too much)
 
 ## Current Structure
 
 | File/Directory | Purpose | Status |
 |----------------|---------|--------|
-| `src/app/page.tsx` | Home page | ✅ Ready |
-| `src/app/layout.tsx` | Root layout | ✅ Ready |
-| `src/app/globals.css` | Global styles | ✅ Ready |
-| `.kilocode/` | AI context & recipes | ✅ Ready |
+| `src/app/page.tsx` | Main app with splash, login, customer, seller, admin views | ✅ Complete |
+| `src/app/globals.css` | Global styles with gradient-green | ✅ Complete |
+| `src/components/AppLogo.tsx` | Logo component with size variants | ✅ Complete |
+| `src/components/TopBar.tsx` | Navigation top bar | ✅ Complete |
+| `src/components/BottomNav.tsx` | Bottom navigation | ✅ Complete |
+| `src/lib/translations.ts` | English/Arabic translations | ✅ Complete |
 
-## Current Focus
+## Features Implemented
 
-The template is ready. Next steps depend on user requirements:
-
-1. What type of application to build
-2. What features are needed
-3. Design/branding preferences
-
-## Quick Start Guide
-
-### To add a new page:
-
-Create a file at `src/app/[route]/page.tsx`:
-```tsx
-export default function NewPage() {
-  return <div>New page content</div>;
-}
-```
-
-### To add components:
-
-Create `src/components/` directory and add components:
-```tsx
-// src/components/ui/Button.tsx
-export function Button({ children }: { children: React.ReactNode }) {
-  return <button className="px-4 py-2 bg-blue-600 text-white rounded">{children}</button>;
-}
-```
-
-### To add a database:
-
-Follow `.kilocode/recipes/add-database.md`
-
-### To add API routes:
-
-Create `src/app/api/[route]/route.ts`:
-```tsx
-import { NextResponse } from "next/server";
-
-export async function GET() {
-  return NextResponse.json({ message: "Hello" });
-}
-```
-
-## Available Recipes
-
-| Recipe | File | Use Case |
-|--------|------|----------|
-| Add Database | `.kilocode/recipes/add-database.md` | Data persistence with Drizzle + SQLite |
-
-## Pending Improvements
-
-- [ ] Add more recipes (auth, email, etc.)
-- [ ] Add example components
-- [ ] Add testing setup recipe
+- Splash screen with language selector (English/Arabic)
+- Customer login with Google
+- Seller login with phone/password
+- Admin panel (email: zerogoast@gmail.com)
+- Order gas flow
+- Safety info
+- Complaints
+- Account management
+- Full RTL support for Arabic
 
 ## Session History
 
@@ -88,3 +43,12 @@ export async function GET() {
 | 2026-03-04 | Built GasNow Jordan - full bilingual gas delivery app UI |
 | 2026-03-04 | Fixed admin login (email-only, zerogoast@gmail.com), improved logo, polished UI text and design |
 | 2026-03-04 | Updated AppLogo to use green gradient (matching app brand) instead of white box |
+| 2026-03-04 | Made green header areas smaller (user request) |
+| 2026-03-04 | Fixed app sizing after shrinking too much - restored proper proportions |
+
+## Design Notes
+
+- Green gradient header: `linear-gradient(135deg, #16a34a 0%, #15803d 50%, #166534 100%)`
+- App name: "GasNow" / "غاز ناو"
+- Country: "Jordan" / "الأردن"
+- All views support RTL for Arabic
