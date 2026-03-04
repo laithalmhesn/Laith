@@ -185,11 +185,11 @@ export default function Home() {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
         {/* Header */}
-        <div className="gradient-green px-2 py-1 text-center relative overflow-hidden">
+        <div className="gradient-green px-1 py-0.5 text-center relative overflow-hidden">
           <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-20 translate-x-20" />
           <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full translate-y-16 -translate-x-16" />
           <div className="absolute top-4 right-4 z-10">
-            <button onClick={toggleLang} className="text-white/80 text-sm bg-white/20 px-3 py-1.5 rounded-full hover:bg-white/30 transition font-medium">
+            <button onClick={toggleLang} className="text-white/80 text-xs bg-white/20 px-2 py-1 rounded-full hover:bg-white/30 transition font-medium">
               {t.switchLanguage}
             </button>
           </div>
@@ -197,12 +197,12 @@ export default function Home() {
             <div className="flex justify-center">
               <AppLogo size="sm" />
             </div>
-            <h1 className="text-lg font-black text-white">{t.loginTitle}</h1>
+            <h1 className="text-base font-black text-white">{t.loginTitle}</h1>
             <p className="text-green-100 text-xs">{t.loginSubtitle}</p>
           </div>
         </div>
 
-        <div className="flex-1 px-2 -mt-28 pb-1">
+        <div className="flex-1 px-1 -mt-32 pb-0.5">
           {!loginType ? (
             <div className="space-y-4">
               {/* Customer Login */}
